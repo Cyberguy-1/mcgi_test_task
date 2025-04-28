@@ -1,0 +1,12 @@
+
+rule s_f_rule {
+    meta:
+        description = "Detects H264 context before modifications"
+        author = "YARA"
+    strings:
+        $a = { 8B 45 10 8B 4D 14 8B 55 18 3B 45 1C 75 05 }
+        $b = { 8B 45 10 8B 55 14 8B 4D 18 3B 45 1C 75 05 }
+        $c = { 8B 45 10 8B 55 14 8B 4D 18 3B 55 1C 75 05 }
+    condition:
+        all of them
+}

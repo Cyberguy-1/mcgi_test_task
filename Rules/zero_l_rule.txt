@@ -1,0 +1,10 @@
+
+rule zero_l_rule {
+  meta:
+    description = "Detects code before modifications"
+    author = "Unknown"
+  strings:
+    $s1 = { 73 20 28 73 2d 3e 6c 61 6d 62 64 61 20 2a 20 72 61 74 69 6f 2c 20 36 35 35 33 36 2e 66 29 }
+  condition:
+    $s1
+}

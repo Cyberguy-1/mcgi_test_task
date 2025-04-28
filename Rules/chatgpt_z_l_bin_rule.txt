@@ -1,0 +1,18 @@
+rule chatgpt_zero_l_bin_rule
+{
+    meta:
+        description = "Detects vulnerable binary of aacenc.c before FLT_MIN clip fix"
+        author = "ChatGPT"
+        reference = "Generated from provided git diff"
+        
+    strings:
+        $text_pattern = "s->lambda = FFMIN(s->lambda * ratio, 65536.f);" ascii
+        $float_65536 = { 00 00 80 47 }  // 65536.0 in IEEE 754 little endian float
+        $partial_code = { 
+            ?? ?? ?? ?? ?? ?? ?? ?? 
+            00 00 80 47 
+        } // Example loose match on use of 65536.0f nearby
+        
+    condition:
+        $text_pattern or $float_65536 or $partial_code
+}

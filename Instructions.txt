@@ -1,0 +1,83 @@
+Here is the question. Please use language model as much as possible to help you. 
+Again, just try your best and don’t feel pressure to finish everything. I designed these steps to formulate a research
+idea/pipeline that can help you quickly create your first two publications. 
+
+
+Task: Generating CVE Detection Rules in Binaries with Language Models
+
+Idea and Motivation Modern software security heavily depends on timely identification and patching of vulnerabilities. 
+However, detecting if a particular binary contains a known vulnerability (especially after patching) remains a challenge. 
+This task aims to explore how large language models (LLMs) can assist in generating detection signatures (like YARA rules) 
+directly from code patches (git diffs) and subsequently validate their effectiveness by analyzing compiled binaries.
+
+ 
+You will build a simple but complete pipeline: from identifying real-world security patches, 
+compiling binaries, to using LLMs to auto-generate detection rules, and testing whether these rules can effectively
+detect vulnerabilities across different binary versions.
+
+Step 1: Identify CVE-Related Commits
+
+Find and select
+a small number (2-3) of security-related commits (i.e., commits fixing a CVE).Example (searching ‘cve’ in ffmpeg repo):
+FFmpeg commit fixing CVE
+Download or clone the repositories locally.
+
+Step 2: Compile and Decompile Before and After Binaries
+
+Language model can help you write a Ghidra headless script to extract decompiled code from a given binary.
+For each selected commit:
+Checkout the code
+before the patch.Compile the project to get the "vulnerable" binary.Checkout the code
+after the patch.Compile again to get the "patched" binary.Use the decompile script to generate the decompiled code 
+for either binary (in json format).
+
+Save both json files for later scanning.
+ 
+Step 3: Generate YARA Rules Using Language Models
+
+Use the
+HuggingFace API to interact with language model.Design a
+fixed prompt template that:
+Takes a
+git commit diff as input. Describe the task.Asks the model to generate a
+YARA rule aiming to detect the vulnerable json file (corresponding to the vulnerable binary).
+Make sure:
+Temperature is set to 0 (for deterministic output).Stop sequences are configured if needed (to avoid incomplete outputs).
+Write a
+Python script that:
+Automates sending the prompt to the model.Extracts and saves the generated YARA rule (typically we can ask the LM to generate 
+result in a certain json structure).
+
+
+Step 4: Test YARA Rules Against Binaries
+
+Another testing script thatFor each generated YARA rule:
+Scan the
+"vulnerable" and "patched" binaries.Check:
+The vulnerable binary
+should match.The patched binary
+should not match.
+Compute precision, recall, and f1 metric.
+Compare the detection results
+across different models.
+
+Step 5 (Only if time permitted): Fine-tune Using TRL
+
+(Optional if you have time)Use the TRL (Transformer Reinforcement Learning) library.Define a simple reward:
+Correct detection = positive reward.False positive = negative reward.
+Follow a basic training loop:
+ 
+for iteration in range(num_iterations):
+    completions = model.generate(prompts)
+    rewards = testing_function.score(prompts, completions, binaries)
+    dataset = [{"prompt": p, "completion": c, "reward": r} for p, c, r in zip(prompts, completions, rewards)]
+    trainer = RewardTrainer(model, tokenizer, train_dataset=dataset, ...)
+    trainer.train()
+    model.save_pretrained(f"./checkpoint-{iteration}")
+
+
+ 
+With these five steps, we can expand them (with more data and experiments) to two papers for you already. 
+Use language model whenever possible to help you write the code or learn any new concepts.
+ 
+Have fun!

@@ -1,0 +1,17 @@
+rule cgpt_z_l_bin_rule {
+    meta:
+        description = "Detects the compiled binary before the changes were applied in libavcodec/aacenc.c"
+        author = "ChatGPT"
+        date = "2025-04-28"
+
+    strings:
+        // Byte pattern for FFMIN (before change) in the compiled binary
+        $old_lambda_byte_sequence = { 66 0F 6E C0  66 0F 7F C0 }  // Hypothetical pattern for FFMIN bytecode (example, adjust as needed)
+        
+        // Byte pattern for av_clipf (after change) in the compiled binary
+        $new_lambda_byte_sequence = { 8B 44 24 18  F3 0F 5E C0  }  // Hypothetical pattern for av_clipf (example, adjust as needed)
+
+    condition:
+        // Rule triggers if the binary contains the old FFMIN pattern but not the av_clipf pattern
+        $old_lambda_byte_sequence and not $new_lambda_byte_sequence
+}

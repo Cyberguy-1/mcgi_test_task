@@ -1,0 +1,9 @@
+rule test_rule {
+  meta:
+    description = "Detects changes in aacenc.c"
+    author = "Cybersecurity Expert"
+  strings:
+    $s1 = { 10 }
+  condition:
+    all of them
+}
